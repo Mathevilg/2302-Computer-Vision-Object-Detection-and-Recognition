@@ -5,6 +5,7 @@
 - opencv
 - numpy
 - sklearn
+- pickle
 
 #
 - `ROI_coordinates.py` given the input directory containing raw images, finds the ROI (hands) and saves the cropped hand images in another directory.

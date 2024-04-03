@@ -95,30 +95,31 @@ def train(open_dataset, closed_dataset) :
             images.append(h)
             labels.append(1)
     clf = svm.SVC(probability=True)
-    print(len(images), len(labels))
+    # print(len(images), len(labels))
     clf.fit(images, labels)
-    print(clf.score(images, labels))
+    # print(clf.score(images, labels))
 
-    # Predict probabilities for each class
-    probs = clf.predict_proba(images)
-    # Keep probabilities for the positive class only
-    probs_positive = probs[:, 1]
+    # # Predict probabilities for each class
+    # probs = clf.predict_proba(images)
+    # # Keep probabilities for the positive class only
+    # probs_positive = probs[:, 1]
 
-    # Compute ROC curve and AUC
-    fpr, tpr, thresholds = roc_curve(labels, probs_positive)
-    roc_auc = auc(fpr, tpr)
+    # # Compute ROC curve and AUC
+    # fpr, tpr, thresholds = roc_curve(labels, probs_positive)
+    # roc_auc = auc(fpr, tpr)
+    # print("AUROC: ", roc_auc)
 
-    # Plot ROC curve
-    plt.figure()
-    plt.plot(fpr, tpr, color='darkorange', lw=2, label='ROC curve (area = %0.2f)' % roc_auc)
-    plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
-    plt.xlim([0.0, 1.0])
-    plt.ylim([0.0, 1.05])
-    plt.xlabel('False Positive Rate')
-    plt.ylabel('True Positive Rate')
-    plt.title('Receiver Operating Characteristic')
-    plt.legend(loc="lower right")
-    plt.show()    
+    # # Plot ROC curve
+    # plt.figure()
+    # plt.plot(fpr, tpr, color='darkorange', lw=2, label='ROC curve (area = %0.2f)' % roc_auc)
+    # plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
+    # plt.xlim([0.0, 1.0])
+    # plt.ylim([0.0, 1.05])
+    # plt.xlabel('False Positive Rate')
+    # plt.ylabel('True Positive Rate')
+    # plt.title('Receiver Operating Characteristic')
+    # plt.legend(loc="lower right")
+    # plt.show()    
 
     return clf
 

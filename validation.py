@@ -31,6 +31,8 @@ def validate(classifierFilePath, valid_open_path, valid_closed_path) :
     false_negative = 0
     true_positive = 0
     true_negative = 0
+    images = []
+    labels = []
 
     for filename in os.listdir(valid_open_path):
         if filename.endswith(".jpg"):
@@ -71,6 +73,8 @@ def validate(classifierFilePath, valid_open_path, valid_closed_path) :
                     test_image = cv2.cvtColor(img_cropped, cv2.COLOR_BGR2GRAY)
                     test_image = cv2.resize(test_image, (64, 128))
                     test_image = descriptor_scratch(test_image)
+                    images.append(test_image)
+                    labels.append(0)
                     # hands.append(test_image)
                     if clf.predict([test_image])[0] == 0: # open
                         true_negative += 1
@@ -79,10 +83,15 @@ def validate(classifierFilePath, valid_open_path, valid_closed_path) :
                     elif clf.predict([test_image])[0] == 1: # closed
                         false_positive += 1
                         # write "Closed" on the image
-                        cv2.putText(imgCopy, "Closed", (x, y), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-                        cv2.imshow("img", imgCopy)
-                        cv2.waitKey(0)
-                        cv2.destroyAllWindows()
+                        # cv2.putText(imgCopy, "Closed", (x, y), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+                        # draw box
+                        # cv2.rectangle(imgCopy, (x, y), (x + w, y + h), (0, 0, 255), 2)
+                        # print(len(results.multi_hand_landmarks))
+                        # if false_positive == 1 : cv2.imwrite("i1.jpg", imgCopy)
+                        # else : cv2.imwrite("i2.jpg", imgCopy)
+                        # cv2.imshow("img", imgCopy)
+                        # cv2.waitKey(0)
+                        # cv2.destroyAllWindows()
 
             # cv2.imwrite(os.path.join(output_path, filename), imgCopy)
             # cv2.imshow("img", imgCopy)
@@ -128,6 +137,8 @@ def validate(classifierFilePath, valid_open_path, valid_closed_path) :
                     test_image = cv2.cvtColor(img_cropped, cv2.COLOR_BGR2GRAY)
                     test_image = cv2.resize(test_image, (64, 128))
                     test_image = descriptor_scratch(test_image)
+                    images.append(test_image)
+                    labels.append(1)
                     # hands.append(test_image)
                     if clf.predict([test_image])[0] == 0: # open
                         false_negative += 1
@@ -146,6 +157,29 @@ def validate(classifierFilePath, valid_open_path, valid_closed_path) :
     print("Precision: ", true_positive / (true_positive + false_positive))
     print("Recall: ", true_positive / (true_positive + false_negative))
     print("F1 Score: ", 2 * true_positive / (2 * true_positive + false_positive + false_negative))
+    print("Specificity: ", true_negative / (true_negative + false_positive))
+
+    # Predict probabilities for each class
+    probs = clf.predict_proba(images)
+    # Keep probabilities for the positive class only
+    probs_positive = probs[:, 1]
+
+    # Compute ROC curve and AUC
+    fpr, tpr, thresholds = roc_curve(labels, probs_positive)
+    roc_auc = auc(fpr, tpr)
+    print("AUROC: ", roc_auc)
+
+    # Plot ROC curve
+    plt.figure()
+    plt.plot(fpr, tpr, color='darkorange', lw=2, label='ROC curve (area = %0.2f)' % roc_auc)
+    plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.title('Receiver Operating Characteristic')
+    plt.legend(loc="lower right")
+    plt.show()    
 
     
 

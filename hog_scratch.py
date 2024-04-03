@@ -1,10 +1,7 @@
 import cv2
 import numpy as np
 
-def compute_gradients(gray):
-    # Convert image to grayscale
-    # gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    
+def compute_gradients(gray):    
     # Compute gradients using Sobel operator
     grad_x = cv2.Sobel(gray, cv2.CV_64F, 1, 0, ksize=1)
     grad_y = cv2.Sobel(gray, cv2.CV_64F, 0, 1, ksize=1)
