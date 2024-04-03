@@ -2,7 +2,10 @@ import cv2
 import mediapipe as mp
 import time
 import numpy as np
-from training import *
+from hog_scratch import descriptor_scratch
+import pickle
+import sys
+
 
 def increase_bbox(bbox, scale_factor):
     x, y, w, h = bbox
@@ -36,7 +39,11 @@ def take_picture(cap):
     
     return frame
 
-def main():
+def run_app(classifierFilePath):
+    # Load the classifier
+    with open(classifierFilePath, 'rb') as f:
+        clf = pickle.load(f)
+
     # Open the camera
     cap = open_camera()
     if cap is None:
@@ -96,7 +103,7 @@ def main():
                 else : img_cropped = img[y:y+h, x:x+w]
                 test_image = cv2.cvtColor(img_cropped, cv2.COLOR_BGR2GRAY)
                 test_image = cv2.resize(test_image, (64, 128))
-                test_image = descriptor(test_image)
+                test_image = descriptor_scratch(test_image)
                 
                 isHand = True
                 if (clf.predict([test_image])[0] == 0): 
@@ -134,7 +141,7 @@ def main():
             close_camera(cap)
             break
 
-        if not isOpen and isHand:
+        if not isOpen and isHand and start_time is None:
             close_camera(cap)
             break
 
@@ -142,4 +149,7 @@ def main():
     cv2.destroyAllWindows()
 
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) != 2:
+        print("Usage: python bonus_camera_application.py <classifier_file_path>")
+    else:
+        run_app(sys.argv[1])
